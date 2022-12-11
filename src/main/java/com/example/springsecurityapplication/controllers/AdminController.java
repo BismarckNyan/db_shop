@@ -1,9 +1,13 @@
 package com.example.springsecurityapplication.controllers;
 
+
+
 import com.example.springsecurityapplication.models.Image;
 import com.example.springsecurityapplication.models.Product;
 import com.example.springsecurityapplication.repositories.CategoryRepository;
 import com.example.springsecurityapplication.security.PersonDetails;
+import com.example.springsecurityapplication.services.OrderService;
+import com.example.springsecurityapplication.services.PersonService;
 import com.example.springsecurityapplication.services.ProductService;
 import com.example.springsecurityapplication.util.ProductValidator;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,11 +38,16 @@ public class AdminController {
 
     private final CategoryRepository categoryRepository;
 
+    private final PersonService personService;
+    private final OrderService orderService;
+
     @Autowired
-    public AdminController(ProductValidator productValidator, ProductService productService, CategoryRepository categoryRepository) {
+    public AdminController(ProductValidator productValidator, ProductService productService, CategoryRepository categoryRepository, PersonService personService, OrderService orderService) {
         this.productValidator = productValidator;
         this.productService = productService;
         this.categoryRepository = categoryRepository;
+        this.personService = personService;
+        this.orderService = orderService;
     }
 
     //    @PreAuthorize("hasRole('ROLE_ADMIN') and hasRole('')")
@@ -46,13 +55,13 @@ public class AdminController {
 
     // Метод по отображению главной страницы администратора с выводом товаров
     @GetMapping()
-    public String admin(Model model){
+    public String admin(Model model) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         PersonDetails personDetails = (PersonDetails) authentication.getPrincipal();
 
         String role = personDetails.getPerson().getRole();
 
-        if(role.equals("ROLE_USER")){
+        if (role.equals("ROLE_USER")) {
             return "redirect:/index";
         }
         model.addAttribute("products", productService.getAllProduct());
@@ -61,7 +70,7 @@ public class AdminController {
 
     // Метод по отображению формы добавление
     @GetMapping("/product/add")
-    public String addProduct(Model model){
+    public String addProduct(Model model) {
         model.addAttribute("product", new Product());
         model.addAttribute("category", categoryRepository.findAll());
 //        System.out.println(categoryRepository.findAll().size());
@@ -73,15 +82,15 @@ public class AdminController {
     public String addProduct(@ModelAttribute("product") @Valid Product product, BindingResult bindingResult, @RequestParam("file_one") MultipartFile file_one, @RequestParam("file_two") MultipartFile file_two, @RequestParam("file_three") MultipartFile file_three, @RequestParam("file_four") MultipartFile file_four, @RequestParam("file_five") MultipartFile file_five) throws IOException {
 
         productValidator.validate(product, bindingResult);
-        if(bindingResult.hasErrors()){
+        if (bindingResult.hasErrors()) {
             return "product/addProduct";
         }
         // Проверка на пустоту файла
-        if(file_one != null){
+        if (file_one != null) {
             // Дирректория по сохранению файла
             File uploadDir = new File(uploadPath);
             // Если данной дирректории по пути не сущетсвует
-            if(!uploadDir.exists()){
+            if (!uploadDir.exists()) {
                 // Создаем данную дирректорию
                 uploadDir.mkdir();
             }
@@ -99,11 +108,11 @@ public class AdminController {
         }
 
         // Проверка на пустоту файла
-        if(file_two != null){
+        if (file_two != null) {
             // Дирректория по сохранению файла
             File uploadDir = new File(uploadPath);
             // Если данной дирректории по пути не сущетсвует
-            if(!uploadDir.exists()){
+            if (!uploadDir.exists()) {
                 // Создаем данную дирректорию
                 uploadDir.mkdir();
             }
@@ -121,11 +130,11 @@ public class AdminController {
         }
 
         // Проверка на пустоту файла
-        if(file_three != null){
+        if (file_three != null) {
             // Дирректория по сохранению файла
             File uploadDir = new File(uploadPath);
             // Если данной дирректории по пути не сущетсвует
-            if(!uploadDir.exists()){
+            if (!uploadDir.exists()) {
                 // Создаем данную дирректорию
                 uploadDir.mkdir();
             }
@@ -143,11 +152,11 @@ public class AdminController {
         }
 
         // Проверка на пустоту файла
-        if(file_four != null){
+        if (file_four != null) {
             // Дирректория по сохранению файла
             File uploadDir = new File(uploadPath);
             // Если данной дирректории по пути не сущетсвует
-            if(!uploadDir.exists()){
+            if (!uploadDir.exists()) {
                 // Создаем данную дирректорию
                 uploadDir.mkdir();
             }
@@ -165,11 +174,11 @@ public class AdminController {
         }
 
         // Проверка на пустоту файла
-        if(file_five != null){
+        if (file_five != null) {
             // Дирректория по сохранению файла
             File uploadDir = new File(uploadPath);
             // Если данной дирректории по пути не сущетсвует
-            if(!uploadDir.exists()){
+            if (!uploadDir.exists()) {
                 // Создаем данную дирректорию
                 uploadDir.mkdir();
             }
@@ -192,25 +201,56 @@ public class AdminController {
 
     // Метод по удалению товара по id
     @GetMapping("/product/delete/{id}")
-    public String deleteProduct(@PathVariable("id") int id){
+    public String deleteProduct(@PathVariable("id") int id) {
         productService.deleteProduct(id);
         return "redirect:/admin";
     }
 
     // Метод по получению товара по id и отображение шаблона редактирования
     @GetMapping("/product/edit/{id}")
-    public String editProduct(@PathVariable("id") int id, Model model){
+    public String editProduct(@PathVariable("id") int id, Model model) {
         model.addAttribute("editProduct", productService.getProductId(id));
         model.addAttribute("category", categoryRepository.findAll());
         return "product/editProduct";
     }
 
     @PostMapping("/product/edit/{id}")
-    public String editProduct(@ModelAttribute("editProduct") Product product, @PathVariable("id") int id){
+    public String editProduct(@ModelAttribute("editProduct") Product product, @PathVariable("id") int id) {
         productService.updateProduct(id, product);
         return "redirect:/admin";
     }
 
+    @GetMapping("/users")
+    public String getAllPerson(Model model) {
+        model.addAttribute("persons", personService.getAllPerson());
+        return "admin/users";
+    }
+
+    @PostMapping("/setRole/{id}")
+    public String setRole(@PathVariable("id") int id, @RequestParam(value = "role") String role) {
+        personService.updatePerson(id, role);
+        return "redirect:/admin/users";
+    }
 
 
+    @GetMapping("/orders")
+    public String ordersUser(Model model) {
+
+        model.addAttribute("orders", orderService.getAllOrders());
+        return "/admin/orders";
+    }
+
+    @PostMapping("/setStatus/{id}")
+    public String setStatus(@PathVariable("id") int id, @RequestParam(value = "status") int status) {
+        orderService.updateOrder(id, status);
+
+        return "redirect:/admin/orders";
+    }
+
+ @PostMapping("/orders/search")
+    public String orderSearch(@RequestParam ("search") String search,Model model) {
+     model.addAttribute("search_orders",orderService.search(search));
+     model.addAttribute("value_search", search);
+     return  "/admin/orders";
+ }
 }

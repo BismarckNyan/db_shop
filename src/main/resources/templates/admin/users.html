@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Информация о пользователях</title>
+</head>
+<body>
+<h3>Пользователи: </h3>
+<div th:each="person : ${persons}">
+
+    <br>
+    <br>
+
+    <p th:text="'Пользователь: ' + ${person.getLogin()}"></p>
+    <p th:text="'Роль: ' + ${person.getRole()}"></p>
+    <form th:method="POST" th:action="@{/admin/setRole/{id}(id=${person.getId()})}" >
+    <label for="role">Выберите роль пользователя: </label>
+    <select name="role"   id="role">
+        <div>
+            <option th:text="${'Юзер'}" th:value="${'ROLE_USER'}"></option>
+            <option th:text="${'Админ'}" th:value="${'ROLE_ADMIN'}"></option>
+        </div>
+    </select>
+        <input type="submit" value="Сменить роль">
+    </form>
+    </div>
+
+</body>
+</html>
