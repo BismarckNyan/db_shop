@@ -5,6 +5,9 @@
     <title>Информация о товаре</title>
 </head>
 <body>
+<a href="/index">В кабинет</a>
+<a href="/product">К товарамВ</a>
+
     <p th:text="'Наименование: ' + ${product.getTitle()}"></p>
     <p th:text="'Описание: ' + ${product.getDescription()}"></p>
     <p th:text="'Цена: ' + ${product.getPrice()}"></p>
