@@ -1,0 +1,9 @@
+const one=document.getElementById('file_one');
+const two=document.getElementById('file_two');
+const three=document.getElementById('file_three');
+const four=document.getElementById('file_four');
+const five=document.getElementById('file_five');
+one.addEventListener( "change",()=>two.classList.remove("visually-hidden"));
+two.addEventListener( "change",()=>three.classList.remove("visually-hidden"));
+three.addEventListener( "change",()=>four.classList.remove("visually-hidden"));
+four.addEventListener( "change",()=>five.classList.remove("visually-hidden"));

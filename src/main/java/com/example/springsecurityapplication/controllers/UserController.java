@@ -100,10 +100,10 @@ public class UserController {
         return "user/cart";
     }
 
-    @GetMapping("/info/{id}")
+    @GetMapping("/user/info/{id}")
     public String infoProduct(@PathVariable("id") int id, Model model){
         model.addAttribute("product", productService.getProductId(id));
-        return "product/infoProduct";
+        return "user/infoProduct";
     }
 
     @GetMapping("/cart/delete/{id}")
@@ -167,13 +167,13 @@ public class UserController {
                     // Если категория товара не пустая
                     if (!category.isEmpty()) {
                         // Если категория равная мебели
-                        if (category.equals("furniture")) {
+                        if (category.equals("firstCategory")) {
                             model.addAttribute("search_product", productRepository.findByTitleAndCategoryOrderByPrice(search.toLowerCase(), Float.parseFloat(ot), Float.parseFloat(Do), 1));
                             // Если категория равная бытовой техники
-                        } else if (category.equals("appliances")) {
+                        } else if (category.equals("secondCategory")) {
                             model.addAttribute("search_product", productRepository.findByTitleAndCategoryOrderByPrice(search.toLowerCase(), Float.parseFloat(ot), Float.parseFloat(Do), 2));
                             // Если категория равная одежде
-                        } else if (category.equals("clothes")) {
+                        } else if (category.equals("thirdCategory")) {
                             model.addAttribute("search_product", productRepository.findByTitleAndCategoryOrderByPrice(search.toLowerCase(), Float.parseFloat(ot), Float.parseFloat(Do), 3));
                         }
                         // Если категория не выбрана
@@ -187,13 +187,13 @@ public class UserController {
                     // Если категория не пустая
                     if (!category.isEmpty()) {
                         // Если категория равная мебели
-                        if (category.equals("furniture")) {
+                        if (category.equals("firstCategory")) {
                             model.addAttribute("search_product", productRepository.findByTitleAndCategoryOrderByPriceDesc(search.toLowerCase(), Float.parseFloat(ot), Float.parseFloat(Do), 1));
                             // Если категория равная бытовой техники
-                        } else if (category.equals("appliances")) {
+                        } else if (category.equals("secondCategory")) {
                             model.addAttribute("search_product", productRepository.findByTitleAndCategoryOrderByPriceDesc(search.toLowerCase(), Float.parseFloat(ot), Float.parseFloat(Do), 2));
                             // Если категория равная одежде
-                        } else if (category.equals("clothes")) {
+                        } else if (category.equals("thirdCategory")) {
                             model.addAttribute("search_product", productRepository.findByTitleAndCategoryOrderByPriceDesc(search.toLowerCase(), Float.parseFloat(ot), Float.parseFloat(Do), 3));
                         }
                         // Если категория не выбрана
